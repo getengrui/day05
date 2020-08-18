@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--suppress ALL -->
+<mapper namespace="com.bw.mapper.MeetingMapper">
+<resultMap id="c" type="com.bw.bean.Meeting">
+    <id column="id" property="id"/>
+    <result column="code" property="code"/>
+    <result column="name" property="name"/>
+    <result column="stime" property="stime"/>
+    <result column="etime" property="etime"/>
+    <result column="ctime" property="ctime"/>
+    <collection property="type" javaType="com.bw.bean.Type">
+        <id column="tid" property="tid"/>
+        <result column="tname" property="tname"></result>
+    </collection>
+</resultMap>
+
+<select id="select" parameterType="map" resultMap="c">
+    select * from (select m.*,t.tname from meeting m,type t where m.tid=t.tid)a
+    <where>
+        <if test="name != null and name != ''">
+            name like '%${name}%'
+        </if>
+    </where>
+</select>
+
+<insert id="insert" parameterType="com.bw.bean.Meeting" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into meeting(code,name,stime,etime,ctime,tid) values (#{code},#{name},#{stime},#{etime},#{ctime},#{type.tid})
+</insert>
+
+<select id="query" resultType="com.bw.bean.Type">
+    select * from type
+</select>
+
+<delete id="delete" parameterType="int">
+    delete from meeting where id = #{id}
+</delete>
+
+<update id="update" parameterType="com.bw.bean.Meeting">
+    update meeting
+    <set>
+        <if test="code != null and code != ''">
+            code = #{code},
+        </if>
+        <if test="name != null and name != ''">
+            name = #{name},
+        </if>
+        <if test="stime != null and stime != ''">
+            stime = #{stime},
+        </if>
+        <if test="etime != null and etime != ''">
+            etime = #{etime},
+        </if>
+        <if test="ctime != null and ctime != ''">
+            ctime = #{ctime},
+        </if>
+        <if test="type != null and type.tid != null">
+            tid = #{type.tid},
+        </if>
+
+    </set>
+    <where>
+        id = #{id}
+    </where>
+</update>
+
+<select id="find" parameterType="int" resultMap="c">
+    select * from meeting where id = #{id}
+</select>
+
+</mapper>
